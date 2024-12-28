@@ -2,10 +2,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Users</title>
 </head>
 <body>
-<h1></h1>
+<h1>Users</h1>
 <table border="1">
     <thead>
     <tr>
@@ -13,17 +13,24 @@
         <th>Name</th>
         <th>Password</th>
         <th>Roles</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
+    <tr th:each="user : ${users}">
         <td th:text="${user.id}"></td>
         <td th:text="${user.username}"></td>
         <td th:text="${user.password}"></td>
         <td th:text="${user.getRoles()}"></td>
+        <td>
+            <a th:href="@{admin/userEditForm/{id}(id=${user.id})}">edit</a>
+            <a th:href="@{admin/userDelete/{id}(id=${user.id})}">delete</a>
+            <a th:href="@{admin/checkUserPaper/{id}(id=${user.id})}">Check User</a>
+        </td>
     </tr>
     </tbody>
 </table>
+<a href="admin/userCreateForm">Add New User</a>
 <a href="/login">Back To Log in</a>
 </body>
 </html>
