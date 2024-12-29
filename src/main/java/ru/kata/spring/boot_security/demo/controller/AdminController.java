@@ -2,13 +2,9 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
@@ -42,17 +38,19 @@ public class AdminController {
 
     @PostMapping("/userCreateForm")
     public String createUser(@ModelAttribute User user,
-                             @RequestParam(value = "chose_role") String[] roles,
-                             Model model,
-                             BindingResult bindingResult) {
+                             @RequestParam(value = "chose_role", required = false) String[] roles,
+                             Model model) {
+        if (roles == null) {
+            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            model.addAttribute("user", new User());
+            return "userCreateForm";
+        }
         try {
             userService.save(user, Arrays.asList(roles));
             return "redirect:/admin";
         } catch (DataIntegrityViolationException e) {
             model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
-            model.addAttribute("errorMessage", "User with this username already exists.");
             model.addAttribute("user", new User());
-
             return "userCreateForm";
         }
     }
@@ -66,14 +64,29 @@ public class AdminController {
     @GetMapping("/userEditForm/{id}")
     public String editUser(@PathVariable("id") Long id, Model model) {
         User user = userService.findUserById(id);
-        model.addAttribute("users", user);
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
         return "userEditForm";
     }
 
     @PostMapping("/userEditForm/{id}")
-    public String editUser(User user) {
-        userService.edit(user);
-        return "redirect:/admin";
+    public String editUser(@PathVariable("id") Long id,
+                           @ModelAttribute User user,
+                           @RequestParam(value = "choose_role", required = false) String[] roles,
+                           Model model) {
+        if (roles == null) {
+            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            model.addAttribute("user", user);
+            return "redirect:/admin/userEditForm/{id}";
+        }
+        try {
+            userService.editWithRoles(user, List.of(roles));
+            return "redirect:/admin";
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            model.addAttribute("user", user);
+            return "redirect:/admin/userEditForm/{id}";
+        }
     }
 
     @GetMapping("/checkUserPaper/{id}")
@@ -83,5 +96,3 @@ public class AdminController {
         return "user";
     }
 }
-
-

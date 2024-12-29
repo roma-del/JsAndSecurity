@@ -2,10 +2,8 @@ package ru.kata.spring.boot_security.demo.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.ArrayList;
+import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
 
 

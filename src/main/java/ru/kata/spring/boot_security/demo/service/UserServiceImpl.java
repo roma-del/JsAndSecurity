@@ -81,6 +81,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void editWithRoles(User user, List<String> roles) {
+        List<Role> roleList = new ArrayList<>();
+        for (String role : roles) {
+            Optional<Role> foundRole = roleRepository.findByRoleName(role);
+            if (foundRole.isPresent()) {
+                roleList.add(foundRole.get());
+            } else {
+                Role newRole = new Role(role);
+                roleRepository.save(newRole);
+                roleList.add(newRole);
+            }
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setUsername(user.getUsername());
+        user.setRoles(roleList);
+        userRepository.save(user);
+    }
+
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
