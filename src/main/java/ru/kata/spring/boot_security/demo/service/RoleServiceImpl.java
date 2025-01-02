@@ -31,7 +31,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional
     public List<Role> editRoles(String[] roles) {
         List<Role> roleList = new ArrayList<>();
         for (String role : roles) {
