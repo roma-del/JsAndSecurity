@@ -1,13 +1,11 @@
 package ru.kata.spring.boot_security.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
 
 
-@Data
 @Entity
 @Table(name = "table_roles")
 public class Role implements GrantedAuthority {
@@ -15,7 +13,7 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String roleName;
 
     @ManyToMany(mappedBy = "roles")

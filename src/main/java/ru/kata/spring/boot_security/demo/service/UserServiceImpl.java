@@ -4,11 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,47 +19,43 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    PasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder bCryptPasswordEncoder;
 
-    RoleRepository roleRepository;
-
+    private final RoleService roleService;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, @Lazy PasswordEncoder bCryptPasswordEncoder, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, @Lazy PasswordEncoder bCryptPasswordEncoder, RoleService roleService) {
         this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        this.roleRepository = roleRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.roleService = roleService;
     }
 
+    @Override
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    @Override
     public User findUserById(Long id) {
         return userRepository.findById(id).orElse(new User());
     }
 
+    @Override
     @Transactional
     public void save(User user, List<String> roles) {
         Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
-        if (foundUser.isPresent() & roleRepository.findAll().contains(foundUser)) {
+        if (foundUser.isPresent()) {
             throw new UsernameNotFoundException("Username already exists");
         }
         User newUser = new User();
         List<Role> roleList = new ArrayList<>();
 
         for (String role : roles) {
-            Optional<Role> foundRole = roleRepository.findByRoleName(role);
-            if (foundRole.isPresent()) {
-                roleList.add(foundRole.get());
-            } else {
-                Role newRole = new Role(role);
-                roleRepository.save(newRole);
-                roleList.add(newRole);
-            }
+            Optional<Role> foundRole = roleService.findByRoleName(role);
+            foundRole.ifPresent(roleList::add);
         }
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         newUser.setUsername(user.getUsername());
@@ -69,6 +63,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUser);
     }
 
+    @Override
     @Transactional
     public void delete(Long id) {
         if (userRepository.findById(id).isPresent()) {
@@ -76,30 +71,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     @Transactional
     public void edit(User user) {
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void editWithRoles(User user, List<String> roles) {
-        List<Role> roleList = new ArrayList<>();
-        for (String role : roles) {
-            Optional<Role> foundRole = roleRepository.findByRoleName(role);
-            if (foundRole.isPresent()) {
-                roleList.add(foundRole.get());
-            } else {
-                Role newRole = new Role(role);
-                roleRepository.save(newRole);
-                roleList.add(newRole);
-            }
-        }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setUsername(user.getUsername());
-        user.setRoles(roleList);
+        user.setRoles(user.getRoles());
         userRepository.save(user);
     }
-
 
 
 

@@ -5,7 +5,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.Arrays;
@@ -16,10 +18,12 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping
@@ -32,16 +36,19 @@ public class AdminController {
     @GetMapping("/userCreateForm")
     public String createUserForm(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+        List<Role> roles = roleService.findAll();
+        model.addAttribute("allRoles", roles);
         return "userCreateForm";
     }
+
 
     @PostMapping("/userCreateForm")
     public String createUser(@ModelAttribute User user,
                              @RequestParam(value = "chose_role", required = false) String[] roles,
                              Model model) {
         if (roles == null) {
-            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            List<Role> allRoles = roleService.findAll();
+            model.addAttribute("allRoles", allRoles);
             model.addAttribute("user", new User());
             return "userCreateForm";
         }
@@ -49,7 +56,8 @@ public class AdminController {
             userService.save(user, Arrays.asList(roles));
             return "redirect:/admin";
         } catch (DataIntegrityViolationException e) {
-            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            List<Role> allRoles = roleService.findAll();
+            model.addAttribute("allRoles", allRoles);
             model.addAttribute("user", new User());
             return "userCreateForm";
         }
@@ -65,7 +73,8 @@ public class AdminController {
     public String editUser(@PathVariable("id") Long id, Model model) {
         User user = userService.findUserById(id);
         model.addAttribute("user", user);
-        model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+        List<Role> allRoles = roleService.findAll();
+        model.addAttribute("allRoles", allRoles);
         return "userEditForm";
     }
 
@@ -75,15 +84,18 @@ public class AdminController {
                            @RequestParam(value = "choose_role", required = false) String[] roles,
                            Model model) {
         if (roles == null) {
-            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            List<Role> allRoles = roleService.findAll();
+            model.addAttribute("allRoles", allRoles);
             model.addAttribute("user", user);
             return "redirect:/admin/userEditForm/{id}";
         }
         try {
-            userService.editWithRoles(user, List.of(roles));
+            user.setRoles(roleService.editRoles(roles));
+            userService.edit(user);
             return "redirect:/admin";
         } catch (DataIntegrityViolationException e) {
-            model.addAttribute("allRoles", List.of("ROLE_USER", "ROLE_ADMIN"));
+            List<Role> allRoles = roleService.findAll();
+            model.addAttribute("allRoles", allRoles);
             model.addAttribute("user", user);
             return "redirect:/admin/userEditForm/{id}";
         }

@@ -1,16 +1,12 @@
 package ru.kata.spring.boot_security.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Data
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -98,8 +94,8 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public String getRoles() {
-        return roles.stream().map(Role::getRoleName).collect(Collectors.joining(", "));
+    public List<Role> getRoles() {
+        return roles;
     }
 
 
