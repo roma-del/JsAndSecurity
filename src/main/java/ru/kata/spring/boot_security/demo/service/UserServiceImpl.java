@@ -75,8 +75,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void edit(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setUsername(user.getUsername());
-        user.setRoles(user.getRoles());
         userRepository.save(user);
     }
 

@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,40 +29,25 @@ public class AdminController {
     }
 
     @GetMapping
-    public String findAllUsers(Model model) {
+    public String findAllUsers(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("username", user);
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
+        model.addAttribute("newuser", new User());
+        List<Role> roles = roleService.findAll();
+        model.addAttribute("allRoles", roles);
         return "adminPage";
     }
 
-    @GetMapping("/userCreateForm")
-    public String createUserForm(Model model) {
-        model.addAttribute("user", new User());
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("allRoles", roles);
-        return "userCreateForm";
-    }
-
-
     @PostMapping("/userCreateForm")
     public String createUser(@ModelAttribute User user,
-                             @RequestParam(value = "chose_role", required = false) String[] roles,
-                             Model model) {
-        if (roles == null) {
-            List<Role> allRoles = roleService.findAll();
-            model.addAttribute("allRoles", allRoles);
-            model.addAttribute("user", new User());
-            return "userCreateForm";
-        }
+                             @RequestParam(value = "role") String[] roles) {
         try {
             userService.save(user, Arrays.asList(roles));
             return "redirect:/admin";
         } catch (DataIntegrityViolationException e) {
-            List<Role> allRoles = roleService.findAll();
-            model.addAttribute("allRoles", allRoles);
-            model.addAttribute("user", new User());
-            return "userCreateForm";
         }
+        return "redirect:/admin";
     }
 
     @GetMapping("/userDelete/{id}")
@@ -69,36 +56,16 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/userEditForm/{id}")
-    public String editUser(@PathVariable("id") Long id, Model model) {
-        User user = userService.findUserById(id);
-        model.addAttribute("user", user);
-        List<Role> allRoles = roleService.findAll();
-        model.addAttribute("allRoles", allRoles);
-        return "userEditForm";
-    }
-
     @PostMapping("/userEditForm/{id}")
-    public String editUser(@PathVariable("id") Long id,
-                           @ModelAttribute User user,
-                           @RequestParam(value = "choose_role", required = false) String[] roles,
-                           Model model) {
-        if (roles == null) {
-            List<Role> allRoles = roleService.findAll();
-            model.addAttribute("allRoles", allRoles);
-            model.addAttribute("user", user);
-            return "redirect:/admin/userEditForm/{id}";
-        }
+    public String editUser(@ModelAttribute User user,
+                           @RequestParam(value = "choose_role") String[] roles) {
         try {
             user.setRoles(roleService.editRoles(roles));
             userService.edit(user);
             return "redirect:/admin";
         } catch (DataIntegrityViolationException e) {
-            List<Role> allRoles = roleService.findAll();
-            model.addAttribute("allRoles", allRoles);
-            model.addAttribute("user", user);
-            return "redirect:/admin/userEditForm/{id}";
         }
+        return "redirect:/admin";
     }
 
     @GetMapping("/checkUserPaper/{id}")

@@ -94,8 +94,12 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public String getRoles() {
+        return roles.stream().map(Role::toString).collect(Collectors.joining(" "));
+    }
+
+    public String toString() {
+        return username;
     }
 
 

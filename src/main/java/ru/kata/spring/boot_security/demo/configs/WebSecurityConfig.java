@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.configs;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +13,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 @Configuration
@@ -32,6 +37,9 @@ public class WebSecurityConfig{
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        String generatedPassword = RandomStringUtils.randomAlphanumeric(12);
+        String hashedPassword = passwordEncoder().encode(generatedPassword);
+        log.info("Сгенерированный пароль для администратора: {}", generatedPassword);
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -44,7 +52,13 @@ public class WebSecurityConfig{
                         .permitAll())
                 .logout(LogoutConfigurer::permitAll)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .userDetailsService(username -> {
+                    if(username.equals("admin")){
+                        return new User("admin", hashedPassword, List.of(new Role("ROLE_ADMIN")));
+                    }
+                    return userService.loadUserByUsername(username);
+                });;
 
         return http.build();
     }

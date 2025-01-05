@@ -29,11 +29,9 @@ public class Role implements GrantedAuthority {
 
 
 
-
-
     @Override
     public String getAuthority() {
-        return this.roleName;
+        return roleName;
     }
 
     @Override
@@ -41,9 +39,6 @@ public class Role implements GrantedAuthority {
         return this.roleName;
     }
 
-    public String getRoleName() {
-        return this.roleName;
-    }
 
     @Override
     public int hashCode() {
