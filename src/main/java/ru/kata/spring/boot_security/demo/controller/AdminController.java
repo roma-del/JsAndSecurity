@@ -10,10 +10,8 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
-
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/admin")
@@ -68,10 +66,4 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/checkUserPaper/{id}")
-    public String userPage(@PathVariable("id") Long id, Model model) {
-        User user = userService.findUserById(id);
-        model.addAttribute("user", user);
-        return "user";
-    }
 }

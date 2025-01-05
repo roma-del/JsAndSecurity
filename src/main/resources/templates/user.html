@@ -96,16 +96,20 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
-                            <th>Password</th>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>Age</th>
+                            <th>Email</th>
                             <th>Roles</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
                             <td th:text="${user.id}"></td>
+                            <td th:text="${user.firstName}"></td>
+                            <td th:text="${user.lastName}"></td>
+                            <td th:text="${user.age}"></td>
                             <td th:text="${user.username}"></td>
-                            <td th:text="${user.password}"></td>
                             <td th:text="${user.getRoles()}"></td>
                         </tr>
                         </tbody>

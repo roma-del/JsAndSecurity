@@ -22,12 +22,9 @@ public class Role implements GrantedAuthority {
     public Role() {
     }
 
-
     public Role(String roleName) {
         this.roleName = roleName;
     }
-
-
 
     @Override
     public String getAuthority() {

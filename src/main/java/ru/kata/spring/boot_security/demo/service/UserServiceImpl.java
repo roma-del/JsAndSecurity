@@ -50,17 +50,14 @@ public class UserServiceImpl implements UserService {
         if (foundUser.isPresent()) {
             throw new UsernameNotFoundException("Username already exists");
         }
-        User newUser = new User();
         List<Role> roleList = new ArrayList<>();
-
         for (String role : roles) {
             Optional<Role> foundRole = roleService.findByRoleName(role);
             foundRole.ifPresent(roleList::add);
         }
-        newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        newUser.setUsername(user.getUsername());
-        newUser.setRoles(roleList);
-        userRepository.save(newUser);
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setRoles(roleList);
+        userRepository.save(user);
     }
 
     @Override

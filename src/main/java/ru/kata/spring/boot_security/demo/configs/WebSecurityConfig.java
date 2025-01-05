@@ -37,9 +37,6 @@ public class WebSecurityConfig{
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        String generatedPassword = RandomStringUtils.randomAlphanumeric(12);
-        String hashedPassword = passwordEncoder().encode(generatedPassword);
-        log.info("Сгенерированный пароль для администратора: {}", generatedPassword);
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -52,13 +49,7 @@ public class WebSecurityConfig{
                         .permitAll())
                 .logout(LogoutConfigurer::permitAll)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .userDetailsService(username -> {
-                    if(username.equals("admin")){
-                        return new User("admin", hashedPassword, List.of(new Role("ROLE_ADMIN")));
-                    }
-                    return userService.loadUserByUsername(username);
-                });;
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
         return http.build();
     }
