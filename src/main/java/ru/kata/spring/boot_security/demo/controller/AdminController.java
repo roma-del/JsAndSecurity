@@ -55,9 +55,16 @@ public class AdminController {
     }
 
     @PostMapping("/userEditForm/{id}")
-    public String editUser(@ModelAttribute User user,
+    public String editUser(@PathVariable("id") Long id,
+                           @ModelAttribute User user,
+                           @ModelAttribute("lastname") String lastname,
+                           @ModelAttribute("firstname") String firstname,
+                           @ModelAttribute("age") int age,
                            @RequestParam(value = "choose_role") String[] roles) {
         try {
+            user.setAge(age);
+            user.setFirstName(firstname);
+            user.setLastName(lastname);
             user.setRoles(roleService.editRoles(roles));
             userService.edit(user);
             return "redirect:/admin";
