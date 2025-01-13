@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,17 +19,21 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String username;
 
+
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private String firstName;
 
+
     @Column(nullable = false)
     private String lastName;
 
+
     @Column(nullable = false)
     private int age;
+
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(

@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface RoleService {
     List<Role> findAll();
     Optional<Role> findByRoleName(String roleName);
-    List<Role> editRoles(String[] roles);
+    List<Role> editRoles(String roles);
 }

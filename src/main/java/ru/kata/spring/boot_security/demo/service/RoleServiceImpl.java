@@ -31,12 +31,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> editRoles(String[] roles) {
+    public List<Role> editRoles(String roles) {
         List<Role> roleList = new ArrayList<>();
-        for (String role : roles) {
-            Optional<Role> foundRole = roleRepository.findByRoleName(role);
-            roleList.add(foundRole.get());
+        for (String role : roles.split(" ")) {
+            roleList.add(roleRepository.findByRoleName(role).get());
         }
         return roleList;
     }
+
 }
