@@ -15,7 +15,7 @@ async function submitEditForm(form, modal) {
         };
         console.log('User data before fetch:', user);
         console.log('fetch: start');
-        const response = await fetch(`/api/userEditForm/${user.id}`, {
+        const response = await fetch(`/api/admin/userEditForm/${user.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ async function submitEditForm(form, modal) {
             body: JSON.stringify(user),
         });
         console.log('fetch: end');
-        console.log('Response from /api/userEditForm:', response);
+        console.log('Response from /api/admin/userEditForm:', response);
         if (!response.ok) {
             const errorMessage = `HTTP error! status: ${response.status}`;
             console.error(errorMessage);
@@ -46,7 +46,7 @@ async function openEditModal(button) {
     try {
         const userId = button.dataset.userId;
         console.log("userId: ", userId);
-        const response = await fetch(`/api/users/${userId}`);
+        const response = await fetch(`/api/admin/users/${userId}`);
         console.log('Response from /api/users:', response);
         if (!response.ok) {
             const message = `HTTP error! status: ${response.status}`;
@@ -100,7 +100,7 @@ async function deleteUser(button) {
     try {
         const userId = button.dataset.userId;
         console.log("userId: ", userId);
-        const response = await fetch(`/api/users/${userId}`);
+        const response = await fetch(`/api/admin/users/${userId}`);
         console.log('Response from /api/users:', response);
         if (!response.ok) {
             const message = `HTTP error! status: ${response.status}`;
@@ -135,7 +135,7 @@ async function deleteUser(button) {
 
         modal.show();
         document.getElementById('confirmDeleteButton').onclick = async () => {
-            const response = await fetch(`/api/userDelete/${userId}`);
+            const response = await fetch(`/api/admin/userDelete/${userId}`);
             console.log('Response from /api/userDelete/ delete:', response);
             if (!response.ok) {
                 const message = `HTTP error! status: ${response.status}`;

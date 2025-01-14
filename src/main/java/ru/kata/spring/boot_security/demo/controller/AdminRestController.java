@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin")
 public class AdminRestController {
     private final UserService userService;
     private final RoleService roleService;
@@ -28,6 +29,7 @@ public class AdminRestController {
         this.roleService = roleService;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users")
     public Map<String, Object> findAllUsers(@AuthenticationPrincipal User user) {
         Map<String, Object> data = new HashMap<>();
@@ -37,11 +39,13 @@ public class AdminRestController {
         return data;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{id}")
     public ResponseEntity<User> findAllUsers(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/userCreateForm")
     public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
         Logger log = Logger.getLogger(AdminRestController.class.getName());
@@ -54,12 +58,14 @@ public class AdminRestController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/userDelete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
         userService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/userEditForm/{id}")
     public ResponseEntity<String> editUser(@PathVariable("id") Long id,
                                            @RequestBody User user) {

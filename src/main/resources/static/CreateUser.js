@@ -1,6 +1,6 @@
 async function createNewUser(user) {
     try {
-        const response =  await fetch("/api/userCreateForm", {
+        const response =  await fetch("/api/admin/userCreateForm", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(user)

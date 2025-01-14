@@ -3,7 +3,7 @@ let allRoles;
 async function loadUsers() {
     try {
         console.log("loadUsers start");
-        let loading = await fetch("/api/users");
+        let loading = await fetch("/api/admin/users");
         console.log("loadUsers after fetch", loading);
         if (!loading.ok) {
             throw new Error(`HTTP error! status: ${loading.status}`);

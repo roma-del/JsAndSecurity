@@ -47,8 +47,13 @@ public class WebSecurityConfig{
     }
     private void configureAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/user").hasAnyRole("USER")
+                .requestMatchers("/api/user/userCreateForm").hasAnyRole("ADMIN")
+                .requestMatchers("/api/user/users").hasAnyRole("ADMIN")
+                .requestMatchers("/api/user/userDelete/{id}").hasAnyRole("ADMIN")
+                .requestMatchers("/api/user/userEditForm/{id}").hasAnyRole("ADMIN")
+                .requestMatchers("/api/user/userEditForm/{id}").hasAnyRole("ADMIN")
                 .requestMatchers("/login/**").permitAll()
                 .anyRequest().authenticated());
     }
